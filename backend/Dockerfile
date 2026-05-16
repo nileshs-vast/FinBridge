@@ -26,7 +26,7 @@ WORKDIR /app
 
 COPY backend/ .
 RUN pip install --upgrade pip \
-    && pip install -e ".[dev]"
+    && pip install -e ".[dev,ai]"
 
 # Copy built React SPA into the location FastAPI's StaticFiles mount expects
 COPY --from=frontend-build /backend/app/static ./app/static

@@ -201,7 +201,7 @@ def patch_transaction(
     changes = body.model_dump(exclude_unset=True)
     for field, value in changes.items():
         setattr(txn, field, value)
-    _audit(db, actor_id, "transaction.patch", txn.id, payload=changes)
+    _audit(db, actor_id, "transaction.patch", txn.id, payload=body.model_dump(mode="json", exclude_unset=True))
     db.commit()
     db.refresh(txn)
     return txn

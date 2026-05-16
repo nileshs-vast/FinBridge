@@ -16,9 +16,14 @@ class FixtureProvider:
         file_bytes = file_path.read_bytes()
         file_hash = hashlib.sha256(file_bytes).hexdigest()
 
+        # Files are stored as "{uuid4()}_{original_name}" — strip the 37-char
+        # UUID+underscore prefix to recover the original stem for seed lookup.
+        stem = file_path.stem
+        original_stem = stem[37:] if len(stem) > 37 and stem[36] == "_" else stem
+
         for candidate in (
             self._seeds_dir / f"{file_hash}.json",
-            self._seeds_dir / f"{file_path.stem}.json",
+            self._seeds_dir / f"{original_stem}.json",
         ):
             if candidate.exists():
                 return ExtractedInvoice.model_validate_json(candidate.read_text())

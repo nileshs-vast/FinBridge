@@ -1,6 +1,6 @@
 # FinBridge — Demo Video Script
 
-Target runtime: ~3 minutes. Record in one take after `make fresh`. Browser tabs pre-loaded for each role at `http://localhost:8000`.
+Target runtime: ~3 minutes. Record in one take after `make fresh`. Browser tabs pre-loaded for each role at `http://localhost`.
 
 ---
 
@@ -28,7 +28,7 @@ Wait for the output to complete:
 
 **Say:** "One command — `make fresh` — wipes the database, rebuilds, and loads 10 pre-staged transactions and 6 demo users. No manual setup."
 
-Switch to the browser. The address bar reads `http://localhost:8000`. The FinBridge login screen is visible.
+Switch to the browser. The address bar reads `http://localhost`. The FinBridge login screen is visible.
 
 ---
 
@@ -42,7 +42,7 @@ After login, the dashboard or upload page is visible. Click **Upload Document** 
 
 **Show:** The upload interface — drag-and-drop area or file picker.
 
-Upload the file `tata_steel_invoice.pdf` (rename any PDF to this filename — the fixture provider matches by stem and returns the pre-built Tata Steel extraction).
+Upload the file `tata_steel_invoice.pdf` from the `sample_invoices/` folder (the fixture provider matches by filename stem and returns the pre-built Tata Steel extraction).
 
 **Say:** "Acme has received a ₹4.95 lakh invoice from Tata Steel. We upload it — PDF, image, Excel, any format works."
 
@@ -78,19 +78,25 @@ Log out. Log in as: `priya@sharmaco.local` / `Finbridge#2026`
 
 Click the Tata Steel transaction row.
 
-**Show:** The transaction detail page — document viewer on the left (the placeholder file or actual PDF), extracted fields on the right. Fields are editable.
+**Show:** The transaction detail page — the original PDF rendered on the left, extracted fields on the right.
 
-**Say:** "Side by side: the original document and the extracted data. The AI got everything right on this one. Let's say Priya wants to confirm the payment head."
+**Say:** "Side by side: the original document and the extracted data. Notice the confidence badges next to each field — the AI tells Priya exactly how certain it was about each value."
+
+**Show:** The confidence badges (e.g., "Vendor 97%", "Total 95%") in green next to field labels. Point out a field with a yellow or red badge if one is visible.
+
+**Say:** "Green means the AI is confident. Yellow or red means Priya should double-check — maybe the document was a photo taken at an angle."
 
 If the payment head is not already set, select "Raw Materials → Steel" from the payment head dropdown.
-
-**Say:** "Payment head confirmed. One click to approve."
 
 Click **Approve**.
 
 **Show:** The status updates to `accepted`. A toast notification confirms the action. The transaction disappears from the pending queue.
 
-**Say:** "The transaction is now in the accepted ledger. Full audit trail: uploaded by Acme's user, reviewed and approved by Priya, timestamps on everything."
+**Say:** "Approved. Now scroll down to the audit trail."
+
+**Show:** The audit trail panel at the bottom-left of the page — a chronological list showing "Uploaded", "Submitted for review", "Approved" with timestamps.
+
+**Say:** "Full audit trail: every status change, who made it, and when — automatically. No extra effort from Priya."
 
 ---
 
@@ -137,9 +143,9 @@ Switch back to the terminal window.
 
 **Show:** The `docker-compose.yml` (briefly) or just the terminal output from `make up`.
 
-**Say:** "Everything you just saw runs in two Docker containers: the FastAPI backend serving the React frontend on a single port — 8000. One `docker compose up --build`, no configuration required."
+**Say:** "Everything you just saw runs in three Docker containers: nginx on port 80 proxying requests to FastAPI, which serves the React frontend and all API routes. Postgres stores everything. One `docker compose up --build`, no configuration required."
 
-**Show:** The browser at `http://localhost:8000`. The login screen is clean and responsive.
+**Show:** The browser at `http://localhost`. The login screen is clean and responsive.
 
 **Say:** "Upload to approval in under 60 seconds. Accountants stop doing data entry and start doing accounting. That's FinBridge."
 
@@ -153,7 +159,7 @@ Switch back to the terminal window.
 - [ ] Terminal font size at 16pt minimum
 - [ ] Audio: microphone levels checked, room quiet
 - [ ] Screen resolution: 1920×1080 or 1440×900
-- [ ] Upload file ready: `tata_steel_invoice.pdf` (or any file with `tata_steel_invoice` in the name for fixture matching)
+- [ ] Upload file ready: `sample_invoices/tata_steel_invoice.pdf`
 - [ ] Fallback: fixture extraction is offline — demo works without internet
 
 ## Timing Notes

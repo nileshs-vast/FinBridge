@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FinBridge — Presentation</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  @page { size: A4 landscape; margin: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #1e293b;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  @media print {
+    body { background: white; }
+    .slide { margin-bottom: 0 !important; }
+  }
+
+  /* Each slide = exactly one A4 landscape page (1122 × 794 px at 96 dpi) */
+  .slide {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+    page-break-after: always;
+    margin-bottom: 2px;
+  }
+  .slide:last-child { page-break-after: avoid; }
+
+  /* ── Left accent strip ───────────────────────────────── */
+  .L {
+    width: 185px;
+    flex-shrink: 0;
+    background: linear-gradient(165deg, #0f172a 0%, #1e3a5f 52%, #1d4ed8 100%);
+    display: flex;
+    flex-direction: column;
+    padding: 24px 18px;
+  }
+  .brand { font-size: 17px; font-weight: 800; color: #fff; }
+  .brand em { color: #60a5fa; font-style: normal; }
+
+  .L-mid { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  .bignum {
+    font-size: 84px; font-weight: 900; line-height: 1; letter-spacing: -4px;
+    color: rgba(255,255,255,.1); margin-bottom: 10px;
+  }
+  .bar { width: 28px; height: 2px; background: #3b82f6; margin-bottom: 12px; }
+  .tag {
+    display: inline-block; align-self: flex-start;
+    font-size: 8px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+    color: #93c5fd; border: 1px solid rgba(147,197,253,.35);
+    background: rgba(147,197,253,.1); padding: 3px 9px; border-radius: 20px; margin-bottom: 10px;
+  }
+  .L-title { font-size: 12.5px; font-weight: 600; color: #cbd5e1; line-height: 1.45; }
+
+  .pg { font-size: 10px; color: rgba(255,255,255,.28); font-weight: 600; letter-spacing: .1em; }
+
+  /* ── Right content zone ──────────────────────────────── */
+  .R {
+    flex: 1;
+    background: #fff;
+    padding: 32px 42px 28px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  /* Fixed header inside .R */
+  .eyebrow { font-size: 9.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #94a3b8; margin-bottom: 3px; }
+  h1 { font-size: 44px; font-weight: 800; color: #0f172a; line-height: 1.08; margin-bottom: 6px; }
+  .sub {
+    font-size: 17px; color: #3b82f6; font-weight: 500;
+    padding-bottom: 13px; margin-bottom: 16px;
+    border-bottom: 2px solid #f1f5f9; flex-shrink: 0;
+  }
+
+  /* Flexible body — fills everything below the header */
+  .body { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+
+  /* Grid helpers: grid-template-rows: 1fr makes the single row fill height */
+  .g2 { display: grid; grid-template-columns: 1fr 1fr;           grid-template-rows: 1fr; gap: 16px; }
+  .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr;       grid-template-rows: 1fr; gap: 16px; }
+  .g4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr;   grid-template-rows: 1fr; gap: 16px; }
+  .fill { flex: 1; min-height: 0; } /* stretch inside .body */
+
+  /* ── Panel card ──────────────────────────────────────── */
+  .panel {
+    background: #f8fafc; border: 1px solid #e2e8f0;
+    border-top: 3px solid #3b82f6; border-radius: 8px;
+    padding: 18px 20px;
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  .panel.green  { border-top-color: #10b981; }
+  .panel.purple { border-top-color: #8b5cf6; }
+  .panel.amber  { border-top-color: #f59e0b; }
+  .panel.slate  { border-top-color: #64748b; }
+  .panel.plain  { background: transparent; border: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0; }
+
+  /* ── Typography ──────────────────────────────────────── */
+  h3       { font-size: 14px; font-weight: 700; color: #1d4ed8; margin-bottom: 10px; }
+  h3.dark  { color: #0f172a; }
+  h3.muted { font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: #64748b; margin-bottom: 8px; }
+
+  p { font-size: 15px; line-height: 1.6; color: #475569; margin-bottom: 8px; }
+  p:last-child { margin-bottom: 0; }
+
+  ul { list-style: none; padding: 0; }
+  li {
+    font-size: 15px; line-height: 1.55; color: #475569;
+    padding-left: 16px; position: relative; margin-bottom: 9px;
+  }
+  li:last-child { margin-bottom: 0; }
+  li::before { content: '›'; position: absolute; left: 0; color: #3b82f6; font-weight: 700; font-size: 17px; line-height: 1.4; }
+  li strong { color: #1e293b; font-weight: 600; }
+
+  /* ── Metrics bar ─────────────────────────────────────── */
+  .metrics { display: flex; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; flex-shrink: 0; margin-bottom: 16px; }
+  .mbox { flex: 1; padding: 14px 8px; text-align: center; background: #f8fafc; border-right: 1px solid #e2e8f0; }
+  .mbox:last-child { border-right: none; }
+  .mv { font-size: 36px; font-weight: 900; color: #1d4ed8; line-height: 1; }
+  .ml { font-size: 10px; color: #64748b; font-weight: 500; margin-top: 4px; }
+
+  /* ── Table ───────────────────────────────────────────── */
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th { padding: 8px 12px; background: #f1f5f9; font-weight: 700; color: #334155; border-bottom: 2px solid #e2e8f0; text-align: left; }
+  td { padding: 7px 12px; border-bottom: 1px solid #f1f5f9; color: #475569; }
+  td:first-child { font-weight: 600; color: #334155; }
+
+  /* ── Code / Pre ──────────────────────────────────────── */
+  code { font-family: 'Cascadia Code','Fira Code',monospace; font-size: 12px; background: #f1f5f9; padding: 1px 6px; border-radius: 3px; color: #334155; }
+  pre {
+    font-family: 'Cascadia Code','Fira Code',monospace;
+    font-size: 12px; line-height: 1.55;
+    background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 6px;
+    padding: 11px 13px; color: #334155; white-space: pre; overflow: hidden;
+  }
+
+  /* ── Step flow (slide 3) ─────────────────────────────── */
+  .flow { display: flex; flex: 1; min-height: 0; gap: 0; }
+  .step { flex: 1; display: flex; flex-direction: column; }
+  .step-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    font-size: 13px; font-weight: 700; color: #fff;
+    display: flex; align-items: center; justify-content: center; margin-bottom: 10px; flex-shrink: 0;
+  }
+  .arr { display: flex; align-items: center; color: #cbd5e1; font-size: 26px; padding: 0 5px; flex-shrink: 0; }
+
+  /* ── NEW badge ───────────────────────────────────────── */
+  .new { display: inline-block; font-size: 8px; font-weight: 700; background: #fef3c7; color: #92400e; padding: 1px 5px; border-radius: 8px; vertical-align: middle; margin-left: 3px; }
+
+  /* ── Banner ──────────────────────────────────────────── */
+  .banner {
+    flex-shrink: 0; padding: 11px 18px;
+    background: linear-gradient(90deg, #eff6ff, #f0fdf4);
+    border-left: 4px solid #3b82f6; border-radius: 8px;
+    font-size: 14px; font-weight: 500; color: #1e40af;
+  }
+
+  /* ── Callout (pull quote) ────────────────────────────── */
+  .callout {
+    margin-top: auto; flex-shrink: 0;
+    background: #eff6ff; border-left: 4px solid #1d4ed8; border-radius: 6px;
+    padding: 12px 16px; font-size: 15px; font-weight: 600; color: #1d4ed8; line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     01 — Problem
+════════════════════════════════════════════════════════ -->
+<section class="slide">
+  <div class="L">
+    <div class="brand">Fin<em>Bridge</em></div>
+    <div class="L-mid">
+      <div class="bignum">01</div>
+      <div class="bar"></div>
+      <div class="tag">Problem</div>
+      <div class="L-title">The Invoice Pile Problem</div>
+    </div>
+    <div class="pg">01 / 07</div>
+  </div>
+  <div class="R">
+    <div class="eyebrow">Problem Statement</div>
+    <h1>The Invoice Pile Problem</h1>
+    <div class="sub">Indian SMEs manually key hundreds of vendor bills every month — at a cost their accountants pay every day</div>
+    <div class="body">
+      <div class="g2 fill">
+
+        <div class="panel">
+          <h3 class="muted">Cost of Manual Entry</h3>
+          <ul>
+            <li><strong>8–12 min per invoice</strong> × hundreds of bills per month</li>
+            <li><strong>3–5% error rate</strong> — surfaces only at month-end reconciliation</li>
+            <li><strong>Zero audit trail</strong> — no record of who entered what, or when</li>
+            <li>Accountants doing <strong>data entry instead of advisory work</strong></li>
+          </ul>
+          <div class="callout">
+            This affects every SME working with an external accounting firm.
+            FinBridge is the fix.
+          </div>
+        </div>
+
+        <div class="panel amber">
+          <h3 class="muted">What Breaks When This Fails</h3>
+          <ul>
+            <li>GST filings with wrong input-tax-credit amounts</li>
+            <li>Payments sent to the wrong vendor account</li>
+            <li>Salary disbursements booked under the wrong cost centre</li>
+            <li>MIS reports delivered late — underlying data isn't clean</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     02 — Solution
+════════════════════════════════════════════════════════ -->
+<section class="slide">
+  <div class="L">
+    <div class="brand">Fin<em>Bridge</em></div>
+    <div class="L-mid">
+      <div class="bignum">02</div>
+      <div class="bar"></div>
+      <div class="tag">Solution</div>
+      <div class="L-title">From Pile to Ledger in Seconds</div>
+    </div>
+    <div class="pg">02 / 07</div>
+  </div>
+  <div class="R">
+    <div class="eyebrow">Solution</div>
+    <h1>FinBridge</h1>
+    <div class="sub">A SaaS workspace shared between accounting firms and their clients — upload to approval in under 60 seconds</div>
+    <div class="body">
+
+      <div class="g3 fill">
+        <div class="panel">
+          <h3>① Upload</h3>
+          <p>Company user uploads any document — vendor invoice (PDF or image), salary register, bank statement. Any format, any Indian vendor.</p>
+        </div>
+        <div class="panel green">
+          <h3 style="color:#059669;">② Extract</h3>
+          <p>Claude vision or Gemini extracts vendor name, GSTIN, invoice #, date, CGST/SGST/IGST, and line items in 2–5 seconds.</p>
+          <p><strong>Per-field confidence scores</strong> tell accountants exactly which values to double-check.</p>
+        </div>
+        <div class="panel purple">
+          <h3 style="color:#7c3aed;">③ Review &amp; Approve</h3>
+          <p>Accountant sees the original document and extracted fields side-by-side with <strong>color-coded confidence badges</strong>.</p>
+          <p>One click to approve. Full <strong>audit trail</strong> written automatically.</p>
+        </div>
+      </div>
+
+      <ul style="display:grid;grid-template-columns:1fr 1fr;gap:6px 24px;margin-top:14px;flex-shrink:0;">
+        <li><strong>Multi-company:</strong> one accountant, all client companies in a single queue</li>
+        <li><strong>Offline-capable:</strong> fixture provider — 10 real Indian invoice PDFs bundled</li>
+        <li><strong>Three-tier tenancy:</strong> Platform → Firm → Company, service-layer isolation</li>
+        <li><strong>Full audit trail:</strong> every change logged with user + timestamp, shown in UI</li>
+      </ul>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     03 — Demo Flow
+════════════════════════════════════════════════════════ -->
+<section class="slide">
+  <div class="L">
+    <div class="brand">Fin<em>Bridge</em></div>
+    <div class="L-mid">
+      <div class="bignum">03</div>
+      <div class="bar"></div>
+      <div class="tag">Demo</div>
+      <div class="L-title">Upload to Approval Under 60 Seconds</div>
+    </div>
+    <div class="pg">03 / 07</div>
+  </div>
+  <div class="R">
+    <div class="eyebrow">Live Demo Flow</div>
+    <h1>Upload to Approval in Under 60 Seconds</h1>
+    <div class="sub">Company User → AI Extraction → Accountant Review → Accepted Ledger</div>
+    <div class="body">
+
+      <div class="flow">
+        <div class="step panel">
+          <div class="step-num" style="background:#1d4ed8;">1</div>
+          <h3 class="dark">Company User — Upload</h3>
+          <ul>
+            <li>PDF, image, or Excel</li>
+            <li>Any Indian vendor format</li>
+            <li>MIME-validated, 10 MB cap</li>
+            <li>Stored with randomised name</li>
+          </ul>
+        </div>
+        <div class="arr">›</div>
+        <div class="step panel green">
+          <div class="step-num" style="background:#059669;">2</div>
+          <h3 class="dark">AI — Extract</h3>
+          <ul>
+            <li>Vendor name + GSTIN</li>
+            <li>Invoice #, date, total</li>
+            <li>CGST / SGST / IGST</li>
+            <li>Line items + payment head</li>
+            <li>Confidence % per field <span class="new">NEW</span></li>
+          </ul>
+        </div>
+        <div class="arr">›</div>
+        <div class="step panel purple">
+          <div class="step-num" style="background:#7c3aed;">3</div>
+          <h3 class="dark">Accountant — Review</h3>
+          <ul>
+            <li>Doc + fields side-by-side</li>
+            <li>Confidence badges <span class="new">NEW</span></li>
+            <li>Editable extracted fields</li>
+            <li>Audit trail inline <span class="new">NEW</span></li>
+          </ul>
+        </div>
+        <div class="arr">›</div>
+        <div class="step panel slate">
+          <div class="step-num" style="background:#0f172a;">4</div>
+          <h3 class="dark">Outcome</h3>
+          <ul>
+            <li>Approve → accepted ledger</li>
+            <li>Audit log auto-written</li>
+            <li>Reject → with note</li>
+            <li>Request info → re-submit</li>
+          </ul>
+        </div>
+      </div>
+
+      <p style="font-size:12px;color:#94a3b8;margin-top:12px;flex-shrink:0;">
+        Fixture provider matches filenames to pre-built JSON — 10 real Indian PDFs in <code>sample_invoices/</code>.
+        Claude &amp; Gemini fully implemented; one env var to switch.
+      </p>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     04 — Architecture
+════════════════════════════════════════════════════════ -->
+<section class="slide">
+  <div class="L">
+    <div class="brand">Fin<em>Bridge</em></div>
+    <div class="L-mid">
+      <div class="bignum">04</div>
+      <div class="bar"></div>
+      <div class="tag">Architecture</div>
+      <div class="L-title">One Stack, Three Tiers, Three AI Providers</div>
+    </div>
+    <div class="pg">04 / 07</div>
+  </div>
+  <div class="R">
+    <div class="eyebrow">Technical Architecture</div>
+    <h1>One Stack, Three Tiers, Three AI Providers</h1>
+    <div class="sub">Single public port · Application-layer tenant isolation · Pluggable AI</div>
+    <div class="body">
+      <div class="g2 fill">
+
+        <div class="panel">
+          <h3 class="muted">Tenancy Model</h3>
+          <pre>Platform Admin
+  └── Accounting Firm  (Sharma &amp; Co.)
+        ├── Accountants  (all companies)
+        ├── Company A:  Acme Manufacturing
+        │     └── Company Users  (upload)
+        └── Company B:  Lumen IT
+              └── Company Users  (upload)</pre>
+          <p style="margin-top:10px;font-size:13.5px;">Every DB row scoped by <code>firm_id</code> + <code>company_id</code>.
+          Single <code>tenant_scope()</code> FastAPI dependency enforces isolation — verified by a cross-tenant smoke test on every build.</p>
+          <h3 class="muted" style="margin-top:16px;">Deployment</h3>
+          <pre>nginx :80  (public)
+  └── proxy_pass → app :8000  (internal)
+        ├── /api/*   FastAPI routes
+        └── /*       React 18 SPA
+postgres :5432  (internal only)</pre>
+        </div>
+
+        <div class="panel plain">
+          <h3 class="muted">AI Extraction Providers</h3>
+          <table>
+            <thead><tr><th>Provider</th><th>When to use</th><th>Model</th></tr></thead>
+            <tbody>
+              <tr><td>fixture</td><td>Demo / CI / offline</td><td>Pre-built JSON</td></tr>
+              <tr><td>claude</td><td>Production primary</td><td>claude-sonnet-4-6</td></tr>
+              <tr><td>gemini</td><td>Fallback / cost-sensitive</td><td>gemini-2.5-flash</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top:10px;font-size:13.5px;">All three implement <code>ExtractionProvider</code> and return <code>ExtractedInvoice</code> with per-field confidence scores.
+          Switch providers with one env var — no code change.</p>
+          <h3 class="muted" style="margin-top:16px;">Tech Stack</h3>
+          <ul>
+            <li>Python 3.12 · FastAPI 0.115 · SQLAlchemy 2.0 + Alembic · Postgres 16 · psycopg 3</li>
+            <li>React 18 · TypeScript · Vite · Tailwind CSS · shadcn/ui · TanStack Query v5 · Zustand v4</li>
+            <li>Docker Compose · nginx · multi-stage build · idempotent seed script</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     05 — What We Built
+════════════════════════════════════════════════════════ -->
+<section class="slide">
+  <div class="L">
+    <div class="brand">Fin<em>Bridge</em></div>
+    <div class="L-mid">
+      <div class="bignum">05</div>
+      <div class="bar"></div>
+      <div class="tag">What We Built</div>
+      <div class="L-title">48 Hours → Production-Ready Demo</div>
+    </div>
+    <div class="pg">05 / 07</div>
+  </div>
+  <div class="R">
+    <div class="eyebrow">Delivery</div>
+    <h1>48 Hours → Production-Ready Demo</h1>
+    <div class="body">
+
+      <div class="metrics">
+        <div class="mbox"><div class="mv">~4,800</div><div class="ml">Lines of Python</div></div>
+        <div class="mbox"><div class="mv">~5,500</div><div class="ml">TypeScript / TSX</div></div>
+        <div class="mbox"><div class="mv">3</div><div class="ml">AI Providers (all live)</div></div>
+        <div class="mbox"><div class="mv">10</div><div class="ml">Indian Invoice PDFs</div></div>
+      </div>
+
+      <div class="g2 fill">
+
+        <div class="panel">
+          <h3 class="muted">Backend</h3>
+          <ul>
+            <li>JWT auth · 4-role RBAC (platform, firm, accountant, company)</li>
+            <li>Three-tier tenant isolation via single FastAPI dependency</li>
+            <li>Fixture + Claude + Gemini — <strong>all three fully implemented</strong></li>
+            <li>7 API modules incl. new <strong>audit log API</strong> (<code>GET /api/audit</code>)</li>
+            <li>UUID-aware fixture matching for stored uploads</li>
+            <li>Alembic migrations · 8 ORM models</li>
+          </ul>
+        </div>
+
+        <div class="panel green">
+          <h3 class="muted">Frontend + Infrastructure</h3>
+          <ul>
+            <li>12 pages across 4 roles · all wired to real API hooks</li>
+            <li><strong>Per-field AI confidence badges</strong> — green / yellow / red</li>
+            <li><strong>Audit trail panel</strong> in the transaction detail page</li>
+            <li>Blob-based PDF/image rendering (auth-correct in iframe)</li>
+            <li>nginx on :80 · 11 MB upload limit · 120s timeouts</li>
+            <li><strong>E2E test suite</strong>: all 10 PDFs through approve / reject / needs-info + auth guards</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     06 — Roadmap
+════════════════════════════════════════════════════════ -->
+<section class="slide">
+  <div class="L">
+    <div class="brand">Fin<em>Bridge</em></div>
+    <div class="L-mid">
+      <div class="bignum">06</div>
+      <div class="bar"></div>
+      <div class="tag">Roadmap</div>
+      <div class="L-title">Where FinBridge Goes Next</div>
+    </div>
+    <div class="pg">06 / 07</div>
+  </div>
+  <div class="R">
+    <div class="eyebrow">Next Steps</div>
+    <h1>Where FinBridge Goes Next</h1>
+    <div class="sub">From hackathon demo to production accounting platform</div>
+    <div class="body">
+
+      <div class="g3 fill">
+
+        <div class="panel">
+          <h3>Near-term</h3>
+          <ul>
+            <li>Bank statement reconciliation — match payments to invoices, flag unmatched debits</li>
+            <li>Bulk upload with parallel extraction queue</li>
+            <li>Live AI provider toggle in the UI</li>
+          </ul>
+        </div>
+
+        <div class="panel green">
+          <h3 style="color:#059669;">Mid-term</h3>
+          <ul>
+            <li>ERP export: Tally, Zoho Books, QuickBooks</li>
+            <li>Email notifications on approval / rejection</li>
+            <li>GST return pre-fill — GSTR-1 / GSTR-2B reconciliation</li>
+          </ul>
+        </div>
+
+        <div class="panel purple">
+          <h3 style="color:#7c3aed;">Infrastructure</h3>
+          <ul>
+            <li>S3-compatible object storage (one provider swap)</li>
+            <li>Postgres row-level security — second isolation layer</li>
+            <li>Refresh token rotation + MFA</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="banner" style="margin-top:14px;">
+        Built in 48 hours &nbsp;·&nbsp; One developer + Claude Code &nbsp;·&nbsp;
+        Python + React + PostgreSQL &nbsp;·&nbsp; <code>docker compose up --build</code>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     07 — Developing Alongside Claude Code
+════════════════════════════════════════════════════════ -->
+<section class="slide">
+  <div class="L">
+    <div class="brand">Fin<em>Bridge</em></div>
+    <div class="L-mid">
+      <div class="bignum">07</div>
+      <div class="bar"></div>
+      <div class="tag">Experience</div>
+      <div class="L-title">Developing Alongside Claude Code</div>
+    </div>
+    <div class="pg">07 / 07</div>
+  </div>
+  <div class="R">
+    <div class="eyebrow">Developer Experience</div>
+    <h1>Developing Alongside Claude Code</h1>
+    <div class="sub">Pair programming at 10× speed — what worked, what didn't, and what stayed human</div>
+    <div class="body">
+
+      <div class="g2 fill">
+
+        <div class="panel">
+          <h3>What Claude Code built</h3>
+          <ul>
+            <li>Full backend scaffold — FastAPI app factory, SQLAlchemy models, Alembic migrations, JWT auth, all API routes and services</li>
+            <li>Three AI extraction providers — including a fully working Gemini implementation from scratch</li>
+            <li>Complete React frontend — 12 pages, all TanStack Query hooks, Zustand auth store, protected routes</li>
+            <li>Docker multi-stage build, nginx config, seed script, 8 fixture JSONs for Indian invoices</li>
+            <li>E2E test suite covering all 10 sample PDFs across approve / reject / needs-info / auth-guard paths</li>
+            <li>This presentation deck and demo script</li>
+          </ul>
+        </div>
+
+        <div class="panel green">
+          <h3 style="color:#059669;">The human-AI dynamic</h3>
+          <ul>
+            <li><strong>PLAN.md as shared context</strong> — Claude Code followed the build sequence without losing coherence across 9,000+ lines</li>
+            <li><strong>Caught real bugs</strong> — wrong psycopg DSN format, bcrypt version conflict, UUID-prefixed filename fixture matching</li>
+            <li><strong>Every diff reviewed before committing</strong> — no blind "vibe coding"; architecture decisions stayed human-driven</li>
+            <li><strong>Fast iteration on feedback</strong> — "font is too small, lots of empty space" → fixed layout in one turn</li>
+            <li><strong>What stayed human</strong>: trade-off decisions, cut order, the demo narrative, knowing when "good enough" ships</li>
+          </ul>
+          <div class="callout" style="margin-top:auto;">
+            48 hours &nbsp;·&nbsp; 1 developer &nbsp;·&nbsp; 1 AI pair programmer &nbsp;·&nbsp; ~9,500 lines of working, tested code
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

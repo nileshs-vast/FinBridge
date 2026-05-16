@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from app.api import auth, dashboard, health, onboarding, reports, transactions
+from app.api import audit, auth, dashboard, health, onboarding, reports, transactions
 from app.core.config import Settings, get_settings
 from app.extraction import build_provider
 
@@ -29,6 +29,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     app.include_router(health.router, prefix="/api")
     app.include_router(auth.router, prefix="/api")
+    app.include_router(audit.router, prefix="/api")
     app.include_router(transactions.router, prefix="/api")
     app.include_router(onboarding.router, prefix="/api")
     app.include_router(reports.router, prefix="/api")

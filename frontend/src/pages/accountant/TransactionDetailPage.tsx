@@ -4,6 +4,8 @@ import { toast } from 'sonner'
 import { useTransaction, usePatchTransaction } from '@/hooks/useTransactions'
 import { useApproveTransaction, useRejectTransaction, useRequestInfo } from '@/hooks/useAccountant'
 import { usePaymentHeads } from '@/hooks/usePaymentHeads'
+import { useTransactionAudit } from '@/hooks/useAudit'
+import { api } from '@/lib/api'
 import { StatusBadge } from '@/components/transactions/StatusBadge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,6 +13,31 @@ import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import type { TransactionDirection } from '@/types/api'
+
+function confidencePct(v: number): string {
+  return `${Math.round(v * 100)}%`
+}
+
+function ConfidenceBadge({ value }: { value: number | undefined }) {
+  if (value == null) return null
+  const pct = Math.round(value * 100)
+  const color =
+    pct >= 80 ? 'text-green-700 bg-green-50' : pct >= 50 ? 'text-yellow-700 bg-yellow-50' : 'text-red-700 bg-red-50'
+  return (
+    <span className={`ml-2 text-xs px-1.5 py-0.5 rounded font-medium ${color}`}>
+      {confidencePct(value)}
+    </span>
+  )
+}
+
+const ACTION_LABELS: Record<string, string> = {
+  'transaction.upload': 'Uploaded',
+  'transaction.submit': 'Submitted for review',
+  'transaction.approve': 'Approved',
+  'transaction.reject': 'Rejected',
+  'transaction.request_info': 'Requested more info',
+  'transaction.patch': 'Edited',
+}
 
 function ReasonDialog({
   title,
@@ -64,6 +91,7 @@ export default function TransactionDetailPage() {
   const requestInfo = useRequestInfo(id)
 
   const { data: heads = [] } = usePaymentHeads(tx?.company_id)
+  const { data: auditLog = [] } = useTransactionAudit(id)
 
   // Form state
   const [vendor, setVendor] = useState('')
@@ -78,6 +106,19 @@ export default function TransactionDetailPage() {
 
   const [rejectOpen, setRejectOpen] = useState(false)
   const [requestInfoOpen, setRequestInfoOpen] = useState(false)
+  const [attachmentUrl, setAttachmentUrl] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!id) return
+    let objectUrl: string
+    api.get(`/transactions/${id}/attachment`, { responseType: 'blob' })
+      .then(r => {
+        objectUrl = URL.createObjectURL(r.data)
+        setAttachmentUrl(objectUrl)
+      })
+      .catch(() => {})
+    return () => { if (objectUrl) URL.revokeObjectURL(objectUrl) }
+  }, [id])
 
   // Effect 1: reset main form fields only when the transaction ID changes
   useEffect(() => {
@@ -185,6 +226,9 @@ export default function TransactionDetailPage() {
   const isImage = attachment?.mime_type?.startsWith('image/')
   const isPending = tx.status === 'pending_review'
 
+  const confidence = (tx.raw_extraction as any)?.confidence as Record<string, number> | undefined
+  const conf = (field: string) => confidence?.[field]
+
   return (
     <div className="flex h-[calc(100vh-64px)] overflow-hidden">
       {/* LEFT PANEL */}
@@ -192,27 +236,29 @@ export default function TransactionDetailPage() {
         <h2 className="text-lg font-semibold mb-4">Original Document</h2>
         {attachment ? (
           <>
-            {isImage && (
+            {isImage && attachmentUrl && (
               <img
-                src={`/api/transactions/${id}/attachment`}
+                src={attachmentUrl}
                 alt="document"
                 className="max-w-full rounded border"
               />
             )}
-            {isPdf && (
+            {isPdf && attachmentUrl && (
               <iframe
-                src={`/api/transactions/${id}/attachment`}
+                src={attachmentUrl}
                 className="w-full min-h-[600px] rounded border"
                 title="document"
               />
             )}
-            <a
-              href={`/api/transactions/${id}/attachment`}
-              download={attachment.original_name}
-              className="inline-block mt-3 text-sm text-blue-600 hover:underline"
-            >
-              Download original ({attachment.original_name})
-            </a>
+            {attachmentUrl && (
+              <a
+                href={attachmentUrl}
+                download={attachment.original_name}
+                className="inline-block mt-3 text-sm text-blue-600 hover:underline"
+              >
+                Download original ({attachment.original_name})
+              </a>
+            )}
           </>
         ) : (
           <p className="text-gray-500 text-sm">No attachment.</p>
@@ -226,6 +272,29 @@ export default function TransactionDetailPage() {
             <pre className="mt-2 text-xs bg-white rounded border p-3 overflow-x-auto whitespace-pre-wrap">
               {JSON.stringify(tx.raw_extraction, null, 2)}
             </pre>
+          </details>
+        )}
+
+        {auditLog.length > 0 && (
+          <details className="mt-4" open>
+            <summary className="cursor-pointer text-sm font-medium text-gray-600">
+              Audit trail ({auditLog.length})
+            </summary>
+            <ol className="mt-3 space-y-2">
+              {auditLog.map(entry => (
+                <li key={entry.id} className="flex items-start gap-2 text-xs text-gray-600">
+                  <span className="mt-0.5 w-2 h-2 rounded-full bg-blue-400 flex-shrink-0" />
+                  <div>
+                    <span className="font-medium text-gray-800">
+                      {ACTION_LABELS[entry.action] ?? entry.action}
+                    </span>
+                    <span className="text-gray-400 ml-1">
+                      · {new Date(entry.created_at).toLocaleString()}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ol>
           </details>
         )}
       </div>
@@ -256,19 +325,19 @@ export default function TransactionDetailPage() {
         {/* Editable fields */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <Label>Vendor</Label>
+            <Label>Vendor<ConfidenceBadge value={conf('vendor')} /></Label>
             <Input value={vendor} onChange={e => setVendor(e.target.value)} disabled={!isPending} />
           </div>
           <div>
-            <Label>Invoice #</Label>
+            <Label>Invoice #<ConfidenceBadge value={conf('invoice_no')} /></Label>
             <Input value={invoiceNo} onChange={e => setInvoiceNo(e.target.value)} disabled={!isPending} />
           </div>
           <div>
-            <Label>Date</Label>
+            <Label>Date<ConfidenceBadge value={conf('invoice_date')} /></Label>
             <Input type="date" value={txDate} onChange={e => setTxDate(e.target.value)} disabled={!isPending} />
           </div>
           <div>
-            <Label>Amount</Label>
+            <Label>Amount<ConfidenceBadge value={conf('total')} /></Label>
             <Input type="number" value={amount} onChange={e => setAmount(e.target.value)} disabled={!isPending} />
           </div>
           <div>

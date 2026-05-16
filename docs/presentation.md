@@ -33,14 +33,14 @@ FinBridge gives accounting firms a structured SaaS workspace shared with their c
 
 1. **Upload** — A company user uploads any document: vendor invoice (PDF or image), salary register (Excel), bank statement. Any format, any Indian vendor.
 
-2. **Extract** — The AI layer (Claude vision or Gemini) reads the document and extracts structured fields: vendor name, GSTIN, invoice number, date, subtotal, CGST, SGST, IGST, line items, and a suggested payment head. This takes 2–5 seconds. The raw AI response is stored so nothing is lost.
+2. **Extract** — The AI layer (Claude vision or Gemini) reads the document and extracts structured fields: vendor name, GSTIN, invoice number, date, subtotal, CGST, SGST, IGST, line items, and a suggested payment head. This takes 2–5 seconds. The raw AI response is stored so nothing is lost. Each extracted field carries a **confidence score** — the AI tells the accountant exactly which values need a second look.
 
-3. **Review & Approve** — The accountant opens the transaction from a shared review queue. They see the original document on the left, extracted fields on the right. They correct any errors, assign the payment head, and click Approve. The transaction enters the accepted ledger with a full audit trail: who uploaded, when, who reviewed, when, what changed.
+3. **Review & Approve** — The accountant opens the transaction from a shared review queue. They see the original document on the left, extracted fields on the right — with color-coded confidence badges (green/yellow/red). They correct any errors, assign the payment head, and click Approve. The transaction enters the accepted ledger with a full audit trail: who uploaded, when, who reviewed, when, what changed.
 
 **Key properties:**
 - Multi-company: one accountant can review transactions for all their client companies from a single queue
 - Offline-capable: the fixture extraction provider works without any API key, making demos reliable
-- Auditable: every status change and field edit is logged with a timestamp and user ID
+- Auditable: every status change and field edit is logged and surfaced in the UI — no manual record-keeping
 
 ---
 
@@ -50,54 +50,56 @@ FinBridge gives accounting firms a structured SaaS workspace shared with their c
 
 ```
 Company User              AI Layer                  Accountant
-     │                       │                          │
-     ├── Upload bill ────────▶│                          │
-     │   (PDF / image /       │                          │
-     │    Excel)              │                          │
-     │                       ├── Extract fields ─────────▶│
-     │                       │   vendor name             │
-     │                       │   invoice number          │
-     │                       │   date, amount            │
-     │                       │   CGST / SGST / IGST      │
-     │                       │   line items              │
-     │                       │   suggested payment head  │
-     │                       │                          │
-     │◀── Draft preview ─────┤                          │
-     │    (editable)          │                          │
-     │                       │                          │
-     ├── Submit for review ──────────────────────────────▶│
-     │                       │                          │
-     │                       │                     ├── Review queue
-     │                       │                     ├── Open transaction
-     │                       │                     │   (document + fields
-     │                       │                     │    side by side)
-     │                       │                     ├── Edit if needed
-     │                       │                     │
-     │                       │                     ├── Approve ──▶ Accepted ledger
-     │                       │                     │              + audit log entry
-     │                       │                     └── Reject  ──▶ Status: rejected
-     │                       │                                     + rejection note
-     │◀── Status update ─────┼──────────────────────────┘
+     |                       |                          |
+     |-- Upload bill -------->|                          |
+     |   (PDF / image /       |                          |
+     |    Excel)              |                          |
+     |                       |-- Extract fields -------->|
+     |                       |   vendor name             |
+     |                       |   invoice number          |
+     |                       |   date, amount            |
+     |                       |   CGST / SGST / IGST      |
+     |                       |   line items              |
+     |                       |   suggested payment head  |
+     |                       |   confidence scores  NEW  |
+     |                       |                          |
+     |<-- Draft preview ------+                          |
+     |    (editable)          |                          |
+     |                       |                          |
+     |-- Submit for review -------------------------------->|
+     |                       |                          |
+     |                       |                     |-- Review queue
+     |                       |                     |-- Open transaction
+     |                       |                     |   (document + fields
+     |                       |                     |    side by side)
+     |                       |                     |   confidence badges NEW
+     |                       |                     |-- Edit if needed
+     |                       |                     |
+     |                       |                     |-- Approve --> Accepted ledger
+     |                       |                     |              + audit log  NEW
+     |                       |                     +-- Reject  --> Status: rejected
+     |                       |                                     + rejection note
+     |<-- Status update ------+---------------------------+
 ```
 
-The fixture provider matches uploaded filenames to pre-built Indian invoice JSON files, making the demo fully reproducible offline. Switching to live Claude or Gemini extraction requires one environment variable change.
+The fixture provider matches uploaded filenames to pre-built Indian invoice JSON files — 10 real Indian invoice PDFs ship with the repo in `sample_invoices/`. Switching to live Claude or Gemini extraction requires one environment variable change — both providers are fully implemented.
 
 ---
 
 ## Slide 4 — Architecture
 
-**Title:** One Container, Three Tiers, Three AI Providers
+**Title:** One Stack, Three Tiers, Three AI Providers
 
 **Tenancy model:**
 
 ```
 Platform Admin
-    └── Accounting Firm (e.g. Sharma & Co.)
-            ├── Accountants (review all companies in firm)
-            ├── Company A: Acme Manufacturing
-            │       └── Company Users (upload only)
-            └── Company B: Lumen IT
-                    └── Company Users (upload only)
+    +-- Accounting Firm (e.g. Sharma & Co.)
+            +-- Accountants (review all companies in firm)
+            +-- Company A: Acme Manufacturing
+            |       +-- Company Users (upload only)
+            +-- Company B: Lumen IT
+                    +-- Company Users (upload only)
 ```
 
 Every database row is scoped by `firm_id` and `company_id`. JWTs carry both claims. A single `tenant_scope()` FastAPI dependency enforces isolation — no Postgres RLS, isolation enforced in application code, verified by a cross-tenant smoke test.
@@ -106,15 +108,18 @@ Every database row is scoped by `firm_id` and `company_id`. JWTs carry both clai
 
 ```
 docker compose up --build
-        │
-        ├── app container (port 8000)
-        │       ├── /api/*   → FastAPI routes
-        │       └── /*       → React 18 SPA (Vite build, served as static files)
-        │
-        └── postgres container (port 5432, internal only)
+        |
+        +-- nginx container (port 80)   <-- reverse proxy, 11 MB upload limit
+        |       +-- proxy_pass --> app:8000
+        |
+        +-- app container (port 8000, internal)
+        |       +-- /api/*   --> FastAPI routes
+        |       +-- /*       --> React 18 SPA (Vite build, served as static files)
+        |
+        +-- postgres container (port 5432, internal only)
 ```
 
-Single origin. No nginx. No CORS. One port for judges, one command for setup.
+Single public port (80). No CORS. nginx handles upload size limits and connection timeouts; FastAPI owns all application logic.
 
 **AI extraction providers:**
 
@@ -124,7 +129,7 @@ Single origin. No nginx. No CORS. One port for judges, one command for setup.
 | `claude` | Production primary | `claude-sonnet-4-6` |
 | `gemini` | Fallback / cost-sensitive | `gemini-2.5-flash` |
 
-All three implement the same `ExtractionProvider` interface and return an identical `ExtractedInvoice` schema. Switch providers with one env var, no code change.
+All three implement the same `ExtractionProvider` interface and return an identical `ExtractedInvoice` schema including per-field confidence scores. Switch providers with one env var, no code change.
 
 **Tech stack:**
 - Backend: Python 3.12, FastAPI 0.115, SQLAlchemy 2.0 + Alembic, Postgres 16, psycopg 3
@@ -139,23 +144,29 @@ All three implement the same `ExtractionProvider` interface and return an identi
 **Backend (Day 1, ~14 hours)**
 - JWT auth with 4-role RBAC (`platform_admin`, `firm_admin`, `accountant`, `company_user`)
 - Three-tier tenant isolation enforced via a single FastAPI dependency
-- Pluggable extraction subsystem: Fixture + Claude + Gemini providers
-- 6 API modules: auth, transactions (upload/list/patch/submit/approve/reject), onboarding (firms/companies/payment-heads/users), reports, dashboard, health
-- Full audit logging on every transaction status change
+- Pluggable extraction subsystem: Fixture + Claude + Gemini providers — all three fully implemented
+- 7 API modules: auth, transactions (upload/list/patch/submit/approve/reject), onboarding (firms/companies/payment-heads/users), reports, dashboard, health, audit log
+- Full audit logging on every transaction status change, surfaced via `/api/audit` with tenant enforcement
 - Alembic migrations for all 8 ORM models
+- UUID-aware fixture matching: uploaded files stored with UUID prefixes are correctly matched to seed JSONs
 
 **Frontend (Day 1–2, ~12 hours)**
 - 12 pages across 4 roles: login, upload + extraction preview, review queue, transaction detail, dashboard, firms, companies, payment heads, team, reports (list + upload), manual transaction entry
+- AI confidence badges on every extracted field in the transaction detail — color-coded green/yellow/red
+- Audit trail panel in the transaction detail — chronological log of every status change with human-readable labels
+- Blob-based attachment rendering — PDFs and images load correctly inside the detail page without leaking auth tokens through iframe src
 - All pages wired to real API hooks via TanStack Query — no mocked data in the UI
 - Protected routes with role-based redirects, loading/empty states, toasts, form validation
 
 **Infrastructure**
-- Docker Compose: two services, one build command
+- Docker Compose: three services (nginx → FastAPI → Postgres), one build command, single public port 80
 - Multi-stage Dockerfile: Node 20 builds React → Python 3.12-slim serves it via StaticFiles
+- nginx reverse proxy: `nginx.conf` sets 11 MB upload limit aligned with `MAX_UPLOAD_BYTES`, 120s timeouts for large uploads
 - Seed script: 6 demo users, 2 companies, 10 pre-staged transactions, 1 MIS report — idempotent, runs on every `make fresh`
-- 8 real Indian invoice fixture JSONs (Tata Steel, BEL, DHL, L&T, SAIL, Mahindra, Bajaj, Wipro) + 1 salary register fixture
+- 10 real Indian invoice PDFs in `sample_invoices/` (Tata Steel, BEL, DHL, L&T, SAIL, Mahindra, Bajaj, Wipro, Ultratech Cement, salary register)
+- E2E test suite (`test_e2e_invoice_workflow.py`): all 10 PDFs through the full approve workflow, plus reject path, needs_info + re-submit path, and auth guard tests (upload requires auth, company user cannot approve/reject, double-approve blocked, 404 on nonexistent transaction)
 
-**Lines of code written from scratch:** ~4,500 Python, ~5,200 TypeScript/TSX
+**Lines of code written from scratch:** ~4,800 Python, ~5,500 TypeScript/TSX
 
 ---
 
@@ -164,9 +175,9 @@ All three implement the same `ExtractionProvider` interface and return an identi
 **Title:** Where FinBridge Goes Next
 
 **Near-term (next sprint)**
-- Live AI provider toggle in the UI — switch between Claude and Gemini without a container restart or env var change
 - Bank statement reconciliation: automatically match payment transactions to accepted invoices, flag unmatched debits
 - Bulk upload: drag-and-drop multiple invoices, queue them for extraction in parallel
+- AI provider toggle in the UI — switch between Claude and Gemini at runtime without a container restart
 
 **Mid-term**
 - ERP export: push accepted transactions to Tally, Zoho Books, or QuickBooks via their APIs — eliminating re-entry on the accountant side as well
