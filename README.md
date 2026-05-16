@@ -11,7 +11,7 @@ FinBridge lets companies upload vendor bills, invoices, and salary registers. An
 ```bash
 cp .env.example .env
 docker compose up --build
-# Open http://localhost:8000
+# Open http://localhost
 ```
 
 The container runs `alembic upgrade head` and seeds demo data automatically on first boot. To reset at any point:
@@ -178,5 +178,5 @@ TanStack Query caches responses. Hard-refresh the browser (`Ctrl+Shift+R`) or cl
 
 **API docs**
 
-OpenAPI schema: [http://localhost:8000/api/openapi.json](http://localhost:8000/api/openapi.json)  
-Swagger UI: [http://localhost:8000/api/docs](http://localhost:8000/api/docs)
+OpenAPI schema: [http://localhost/api/openapi.json](http://localhost/api/openapi.json)  
+Swagger UI: [http://localhost/api/docs](http://localhost/api/docs)
