@@ -28,7 +28,7 @@
 | 23–25 | ✓ DONE | Docker multi-stage build; FastAPI serves React SPA on port 8000 via 404 exception handler |
 | 25–26 | ✓ DONE | Smoke tests: 16/16 passing — auth, upload, approve, cross-tenant isolation |
 | 26–27 | ✓ DONE | README with one-command setup, credentials table, env vars, troubleshooting |
-| 27–28.5 | ✓ DONE | Presentation deck — `docs/presentation.md` (6 slides) |
+| 27–28.5 | ✓ DONE | Presentation deck — `docs/presentation.html` (7 slides, incl. Claude Code dev experience) |
 | 28.5–29 | ✓ DONE | Demo video script — `docs/demo_script.md` (~3 min timestamped) |
 | 29–30 | ✓ DONE | `make fresh` clean build verified; `make test` 16/16 green |
 

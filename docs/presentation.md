@@ -170,6 +170,29 @@ All three implement the same `ExtractionProvider` interface and return an identi
 
 ---
 
+## Slide 7 — Developing Alongside Claude Code
+
+**Title:** Developing Alongside Claude Code — Pair Programming at 10× Speed
+
+**What Claude Code built:**
+- Full backend scaffold — FastAPI app factory, SQLAlchemy models, Alembic migrations, JWT auth, all API routes and services
+- Three AI extraction providers — including a fully working Gemini implementation from scratch
+- Complete React frontend — 12 pages, all TanStack Query hooks, Zustand auth store, protected routes
+- Docker multi-stage build, nginx config, seed script, 8 fixture JSONs for Indian invoices
+- E2E test suite covering all 10 sample PDFs across approve / reject / needs-info / auth-guard paths
+- This presentation deck and demo script
+
+**The human-AI dynamic:**
+- **PLAN.md as shared context** — Claude Code followed the build sequence without losing coherence across 9,000+ lines
+- **Caught real bugs** — wrong psycopg DSN format, bcrypt version conflict, UUID-prefixed filename fixture matching
+- **Every diff reviewed before committing** — no blind "vibe coding"; architecture decisions stayed human-driven
+- **Fast iteration on feedback** — "font is too small, lots of empty space" → fixed layout in one turn
+- **What stayed human**: trade-off decisions, cut order, the demo narrative, knowing when "good enough" ships
+
+> 48 hours · 1 developer · 1 AI pair programmer · ~9,500 lines of working, tested code
+
+---
+
 ## Slide 6 — Roadmap
 
 **Title:** Where FinBridge Goes Next

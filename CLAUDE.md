@@ -14,7 +14,7 @@ FinBridge is a 48-hour hackathon project — a multi-tenant SaaS that lets compa
 - **Seed script**: `backend/app/seeds/run.py` — idempotent; creates 6 demo users, 2 companies, payment-head templates, 10 pre-staged transactions, 1 MIS report. Run via `make seed`.
 - **Fixture extractions**: `backend/seeds/extractions/` — 8 Indian invoice JSONs for the FixtureProvider demo upload flow.
 
-**Remaining:** Block 23-25 (Docker prod build — multi-stage, FastAPI serves built React SPA on single port 8000), Block 25-26 (smoke tests), Block 26-27 (README), Block 27-28.5 (deck), Block 28.5-29 (video). When asked to "do block X-Y", read `docs/PLAN.md` first; the FR IDs in each row point at requirements in [`docs/PRD.md`](./docs/PRD.md), and the API/schema details live in [`docs/HLD.md`](./docs/HLD.md).
+**All blocks complete.** The project is submission-ready: Docker multi-stage build works (`make up`), 16/16 smoke tests green (`make test`), README complete, 7-slide presentation at `docs/presentation.html` (PDF at `docs/presentation.pdf`), demo script at `docs/demo_script.md`. Any future work is polish or bug-fixing only.
 
 ## Architecture essentials
 
