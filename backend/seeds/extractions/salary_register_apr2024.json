@@ -1,0 +1,30 @@
+{
+  "vendor": "Acme Manufacturing Staff",
+  "vendor_address": null,
+  "vendor_gstin": null,
+  "customer_gstin": null,
+  "place_of_supply": null,
+  "invoice_no": "SAL/APR/2024",
+  "invoice_date": "2024-04-30",
+  "due_date": null,
+  "currency": "INR",
+  "subtotal": 1250000.0,
+  "tax_amount": 0.0,
+  "cgst": null,
+  "sgst": null,
+  "igst": null,
+  "reverse_charge": false,
+  "total": 1250000.0,
+  "line_items": [
+    {
+      "description": "Salaries — April 2024 (52 employees)",
+      "quantity": 52.0,
+      "unit_price": 24038.46,
+      "amount": 1250000.0,
+      "hsn_sac": null
+    }
+  ],
+  "suggested_direction": "purchase",
+  "confidence": {"vendor": 0.85, "total": 0.92, "invoice_date": 0.95, "invoice_no": 0.88},
+  "notes": "Salary register extracted from CSV. TDS deductions not included — gross salaries shown."
+}

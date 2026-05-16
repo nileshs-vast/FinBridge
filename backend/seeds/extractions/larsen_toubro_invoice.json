@@ -1,0 +1,30 @@
+{
+  "vendor": "Larsen & Toubro Ltd",
+  "vendor_address": "L&T House, Ballard Estate, Mumbai 400001",
+  "vendor_gstin": "27AABCL0107N1ZJ",
+  "customer_gstin": "27AAACA1234B1Z5",
+  "place_of_supply": "27",
+  "invoice_no": "LT/2024/555",
+  "invoice_date": "2024-05-05",
+  "due_date": "2024-06-05",
+  "currency": "INR",
+  "subtotal": 200000.0,
+  "tax_amount": 36000.0,
+  "cgst": 18000.0,
+  "sgst": 18000.0,
+  "igst": null,
+  "reverse_charge": false,
+  "total": 236000.0,
+  "line_items": [
+    {
+      "description": "Structural Steel Fabrication Works",
+      "quantity": 5.0,
+      "unit_price": 40000.0,
+      "amount": 200000.0,
+      "hsn_sac": "7308"
+    }
+  ],
+  "suggested_direction": "purchase",
+  "confidence": {"vendor": 0.99, "total": 0.99, "invoice_date": 0.98, "invoice_no": 0.98},
+  "notes": null
+}

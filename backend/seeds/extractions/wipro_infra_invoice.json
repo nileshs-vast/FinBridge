@@ -1,0 +1,30 @@
+{
+  "vendor": "Wipro Infrastructure",
+  "vendor_address": "Doddakannelli, Sarjapur Road, Bengaluru 560035",
+  "vendor_gstin": "29AABCW0140G1ZK",
+  "customer_gstin": "27AAACA1234B1Z5",
+  "place_of_supply": "27",
+  "invoice_no": "WIPRO/2024/088",
+  "invoice_date": "2024-05-12",
+  "due_date": "2024-06-12",
+  "currency": "INR",
+  "subtotal": 78000.0,
+  "tax_amount": 14000.0,
+  "cgst": null,
+  "sgst": null,
+  "igst": 14000.0,
+  "reverse_charge": false,
+  "total": 92000.0,
+  "line_items": [
+    {
+      "description": "AMC — HVAC System Maintenance",
+      "quantity": 1.0,
+      "unit_price": 78000.0,
+      "amount": 78000.0,
+      "hsn_sac": "9987"
+    }
+  ],
+  "suggested_direction": "purchase",
+  "confidence": {"vendor": 0.88, "total": 0.95, "invoice_date": 0.84, "invoice_no": 0.90},
+  "notes": "Phone photo — some text near footer partially obscured. Total extracted from top summary box."
+}

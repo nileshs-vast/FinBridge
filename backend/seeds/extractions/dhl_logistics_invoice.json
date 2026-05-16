@@ -1,0 +1,30 @@
+{
+  "vendor": "DHL Logistics",
+  "vendor_address": "Plot 12, MIDC Industrial Area, Pune 411019",
+  "vendor_gstin": null,
+  "customer_gstin": "27AAACA1234B1Z5",
+  "place_of_supply": "27",
+  "invoice_no": "DHL/2024/789",
+  "invoice_date": "2024-04-12",
+  "due_date": "2024-05-12",
+  "currency": "INR",
+  "subtotal": 50000.0,
+  "tax_amount": 9000.0,
+  "cgst": 4500.0,
+  "sgst": 4500.0,
+  "igst": null,
+  "reverse_charge": false,
+  "total": 59000.0,
+  "line_items": [
+    {
+      "description": "Freight Charges — Mumbai to Pune",
+      "quantity": 1.0,
+      "unit_price": 50000.0,
+      "amount": 50000.0,
+      "hsn_sac": "9965"
+    }
+  ],
+  "suggested_direction": "purchase",
+  "confidence": {"vendor": 0.96, "total": 0.99, "invoice_date": 0.93, "invoice_no": 0.97},
+  "notes": null
+}

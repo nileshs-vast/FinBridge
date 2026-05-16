@@ -1,0 +1,30 @@
+{
+  "vendor": "Tata Steel Ltd",
+  "vendor_address": "Bombay House, 24 Homi Mody Street, Mumbai 400001",
+  "vendor_gstin": "27AAACT2727Q1ZW",
+  "customer_gstin": "27AAACA1234B1Z5",
+  "place_of_supply": "27",
+  "invoice_no": "TATA/2024/001",
+  "invoice_date": "2024-04-05",
+  "due_date": "2024-05-05",
+  "currency": "INR",
+  "subtotal": 420000.0,
+  "tax_amount": 75600.0,
+  "cgst": 37800.0,
+  "sgst": 37800.0,
+  "igst": null,
+  "reverse_charge": false,
+  "total": 495600.0,
+  "line_items": [
+    {
+      "description": "HR Steel Coil 5mm",
+      "quantity": 10.0,
+      "unit_price": 42000.0,
+      "amount": 420000.0,
+      "hsn_sac": "7208"
+    }
+  ],
+  "suggested_direction": "purchase",
+  "confidence": {"vendor": 0.98, "total": 0.99, "invoice_date": 0.97, "invoice_no": 0.96},
+  "notes": null
+}

@@ -1,0 +1,30 @@
+{
+  "vendor": "SAIL — Steel Authority of India",
+  "vendor_address": "Ispat Bhawan, Lodi Road, New Delhi 110003",
+  "vendor_gstin": "07AAACS4659Q1ZA",
+  "customer_gstin": "27AAACA1234B1Z5",
+  "place_of_supply": "27",
+  "invoice_no": "SAIL/2024/311",
+  "invoice_date": "2024-05-10",
+  "due_date": "2024-06-10",
+  "currency": "INR",
+  "subtotal": 275423.73,
+  "tax_amount": 49576.27,
+  "cgst": null,
+  "sgst": null,
+  "igst": 49576.27,
+  "reverse_charge": false,
+  "total": 325000.0,
+  "line_items": [
+    {
+      "description": "TMT Bars Fe500D 12mm",
+      "quantity": 15.0,
+      "unit_price": 18361.58,
+      "amount": 275423.73,
+      "hsn_sac": "7214"
+    }
+  ],
+  "suggested_direction": "purchase",
+  "confidence": {"vendor": 0.97, "total": 0.99, "invoice_date": 0.96, "invoice_no": 0.97},
+  "notes": "Inter-state supply (Delhi to Maharashtra) — IGST applies instead of CGST+SGST."
+}
