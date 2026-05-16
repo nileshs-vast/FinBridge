@@ -4,6 +4,8 @@
 
 FinBridge lets companies upload vendor bills, invoices, and salary registers. An AI layer (Claude, Gemini, or an offline fixture provider) extracts structured transaction data in seconds. Accountants then review, edit, and approve with one click — all within a multi-tenant platform built for accounting firms serving multiple client companies.
 
+📽 **[Demo video](docs/demo.mp4)** — 1m41s walkthrough: upload → AI extraction → review → approve → dashboard
+
 ---
 
 ## Quick Start
